@@ -174,30 +174,49 @@ class GraphPanel extends JPanel {
         // Calculate the radius of the circle on which the vertices are located
         int circleRadius = Math.min(getWidth(), getHeight()) / 2 - RADIUS;
 
-        // Draw the vertices and the edges
         for (int i = 0; i < V; i++) {
             // Calculate the position of the vertex
-            int x = centerX + (int) (circleRadius * Math.cos(i * angleStep)) - RADIUS / 2;
-            int y = centerY + (int) (circleRadius * Math.sin(i * angleStep)) - RADIUS / 2;
+            int x1 = centerX + (int) (circleRadius * Math.cos(i * angleStep));
+            int y1 = centerY + (int) (circleRadius * Math.sin(i * angleStep));
 
             // Draw the edges
             for (int j = 0; j < V; j++) {
                 if (this.g.graph[i][j] > 0) {
-                    int x2 = centerX + (int) (circleRadius * Math.cos(j * angleStep)) - RADIUS / 2;
-                    int y2 = centerY + (int) (circleRadius * Math.sin(j * angleStep)) - RADIUS / 2;
+                    int x2 = centerX + (int) (circleRadius * Math.cos(j * angleStep));
+                    int y2 = centerY + (int) (circleRadius * Math.sin(j * angleStep));
+
+                    // Calculate the angle of the line
+                    double angle = Math.atan2(y2 - y1, x2 - x1);
+
+                    // Adjust the line endpoints to the edge of vertex circle
+                    int adjustedX1 = x1 + (int) (RADIUS / 2 * Math.cos(angle));
+                    int adjustedY1 = y1 + (int) (RADIUS / 2 * Math.sin(angle));
+                    int adjustedX2 = x2 - (int) (RADIUS / 2 * Math.cos(angle));
+                    int adjustedY2 = y2 - (int) (RADIUS / 2 * Math.sin(angle));
+
+                    // Draw the edge
                     g.setColor(Color.BLACK);
-                    g.drawLine(x + RADIUS / 2, y + RADIUS / 2, x2 + RADIUS / 2, y2 + RADIUS / 2);
+                    g.drawLine(adjustedX1, adjustedY1, adjustedX2, adjustedY2);
                 }
             }
 
             // Draw the vertex
             g.setColor(Color.ORANGE);
-            g.fillOval(x, y, RADIUS, RADIUS);
+            g.fillOval(x1 - RADIUS / 2, y1 - RADIUS / 2, RADIUS, RADIUS);
             g.setColor(Color.BLACK);
-            g.drawOval(x, y, RADIUS, RADIUS);
+            g.drawOval(x1 - RADIUS / 2, y1 - RADIUS / 2, RADIUS, RADIUS);
+
+            // Draw the number
+            String number = Integer.toString(i);
             g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
-            g.drawString(Integer.toString(i), x + RADIUS / 4, y + 3 * RADIUS / 4);
+            FontMetrics fm = g.getFontMetrics();
+            int textWidth = fm.stringWidth(number);
+            int textHeight = fm.getAscent() - fm.getDescent();
+            int textX = x1 - textWidth / 2;
+            int textY = y1 + textHeight / 2;
+            g.drawString(number, textX, textY);
         }
+
         // Highlight the shortest path
         for (int i = 0; i < shortestPath.size() - 1; i++) {
             int u = shortestPath.get(i);
@@ -214,7 +233,7 @@ class GraphPanel extends JPanel {
             g.drawLine(x1 + RADIUS / 2, y1 + RADIUS / 2, x2 + RADIUS / 2, y2 + RADIUS / 2);
 
             // Draw the vertices
-            g.setColor(Color.ORANGE); 
+            g.setColor(Color.ORANGE);
             g.fillOval(x1, y1, RADIUS, RADIUS);
             g.fillOval(x2, y2, RADIUS, RADIUS);
             g.setColor(Color.BLACK);
@@ -232,5 +251,4 @@ class GraphPanel extends JPanel {
                     (int) (y2 + RADIUS / 2 + fm.getMaxAscent() / 2));
         }
     }
-
 }
