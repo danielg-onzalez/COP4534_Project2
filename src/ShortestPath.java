@@ -30,15 +30,17 @@ class Graph {
         Arrays.fill(prev, -1);
 
         PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
-        pq.offer(new int[]{src, 0});
+        pq.offer(new int[] { src, 0 });
 
         while (!pq.isEmpty()) {
             int[] pair = pq.poll();
             int u = pair[0];
-            if (visited[u]) continue;
+            if (visited[u])
+                continue;
             visited[u] = true;
 
-            if (u == dest) break;
+            if (u == dest)
+                break;
 
             for (int v = 0; v < V; v++) {
                 if (graph[u][v] > 0 && !visited[v]) {
@@ -46,7 +48,7 @@ class Graph {
                     if (newDist < minDist[v]) {
                         minDist[v] = newDist;
                         prev[v] = u;
-                        pq.offer(new int[]{v, newDist});
+                        pq.offer(new int[] { v, newDist });
                     }
                 }
             }
@@ -158,8 +160,68 @@ class GraphPanel extends JPanel {
         this.shortestPath = shortestPath;
     }
 
-//    @Override
-//    protected void paintComponent(Graphics g) {
-//
-//    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Calculate the angle step
+        double angleStep = 2 * Math.PI / V;
+
+        // Calculate the center of the panel
+        int centerX = getWidth() / 2;
+        int centerY = getHeight() / 2;
+
+        // Calculate the radius of the circle on which the vertices are located
+        int circleRadius = Math.min(getWidth(), getHeight()) / 2 - RADIUS;
+
+        // Draw the vertices and the edges
+        for (int i = 0; i < V; i++) {
+            // Calculate the position of the vertex
+            int x = centerX + (int) (circleRadius * Math.cos(i * angleStep)) - RADIUS / 2;
+            int y = centerY + (int) (circleRadius * Math.sin(i * angleStep)) - RADIUS / 2;
+
+            // Draw the edges
+            for (int j = 0; j < V; j++) {
+                if (this.g.graph[i][j] > 0) {
+                    int x2 = centerX + (int) (circleRadius * Math.cos(j * angleStep)) - RADIUS / 2;
+                    int y2 = centerY + (int) (circleRadius * Math.sin(j * angleStep)) - RADIUS / 2;
+                    g.setColor(Color.BLACK);
+                    g.drawLine(x + RADIUS / 2, y + RADIUS / 2, x2 + RADIUS / 2, y2 + RADIUS / 2);
+                }
+            }
+
+            // Draw the vertex
+            g.setColor(Color.ORANGE);
+            g.fillOval(x, y, RADIUS, RADIUS);
+            g.setColor(Color.BLACK);
+            g.drawOval(x, y, RADIUS, RADIUS);
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
+            g.drawString(Integer.toString(i), x + RADIUS / 4, y + 3 * RADIUS / 4);
+        }
+        // Highlight the shortest path
+        for (int i = 0; i < shortestPath.size() - 1; i++) {
+            int u = shortestPath.get(i);
+            int v = shortestPath.get(i + 1);
+
+            // Calculate the positions of the vertices
+            int x1 = centerX + (int) (circleRadius * Math.cos(u * angleStep)) - RADIUS / 2;
+            int y1 = centerY + (int) (circleRadius * Math.sin(u * angleStep)) - RADIUS / 2;
+            int x2 = centerX + (int) (circleRadius * Math.cos(v * angleStep)) - RADIUS / 2;
+            int y2 = centerY + (int) (circleRadius * Math.sin(v * angleStep)) - RADIUS / 2;
+
+            // Draw the edge
+            g.setColor(Color.RED);
+            g.drawLine(x1 + RADIUS / 2, y1 + RADIUS / 2, x2 + RADIUS / 2, y2 + RADIUS / 2);
+
+            // Draw the vertices
+            g.fillOval(x1, y1, RADIUS, RADIUS);
+            g.fillOval(x2, y2, RADIUS, RADIUS);
+            g.setColor(Color.BLACK);
+            g.drawOval(x1, y1, RADIUS, RADIUS);
+            g.drawOval(x2, y2, RADIUS, RADIUS);
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
+            g.drawString(Integer.toString(u), x1 + RADIUS / 4, y1 + 3 * RADIUS / 4);
+            g.drawString(Integer.toString(v), x2 + RADIUS / 4, y2 + 3 * RADIUS / 4);
+        }
+    }
 }
