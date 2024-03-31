@@ -146,7 +146,7 @@ class GraphPanel extends JPanel {
     private Graph g;
     private List<Integer> shortestPath;
     private int V;
-    private static final int RADIUS = 20;
+    private static final int RADIUS = 50;
 
     public GraphPanel(int V) {
         this.V = V;
@@ -214,14 +214,23 @@ class GraphPanel extends JPanel {
             g.drawLine(x1 + RADIUS / 2, y1 + RADIUS / 2, x2 + RADIUS / 2, y2 + RADIUS / 2);
 
             // Draw the vertices
+            g.setColor(Color.ORANGE); 
             g.fillOval(x1, y1, RADIUS, RADIUS);
             g.fillOval(x2, y2, RADIUS, RADIUS);
             g.setColor(Color.BLACK);
             g.drawOval(x1, y1, RADIUS, RADIUS);
             g.drawOval(x2, y2, RADIUS, RADIUS);
-            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
-            g.drawString(Integer.toString(u), x1 + RADIUS / 4, y1 + 3 * RADIUS / 4);
-            g.drawString(Integer.toString(v), x2 + RADIUS / 4, y2 + 3 * RADIUS / 4);
+
+            // Center the numbers in the circle
+            FontMetrics fm = g.getFontMetrics();
+            double textWidth = fm.getStringBounds(Integer.toString(u), g).getWidth();
+            g.drawString(Integer.toString(u), (int) (x1 + RADIUS / 2 - textWidth / 2),
+                    (int) (y1 + RADIUS / 2 + fm.getMaxAscent() / 2));
+
+            textWidth = fm.getStringBounds(Integer.toString(v), g).getWidth();
+            g.drawString(Integer.toString(v), (int) (x2 + RADIUS / 2 - textWidth / 2),
+                    (int) (y2 + RADIUS / 2 + fm.getMaxAscent() / 2));
         }
     }
+
 }
